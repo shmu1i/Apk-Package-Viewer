@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import (
     QPushButton, QFileDialog, QProgressBar, QMenu, QAction, QHBoxLayout, QLabel, QLineEdit, QComboBox
 )
 from PyQt5.QtCore import QSettings, Qt, QTimer
+from PyQt5.QtGui import QFont
 from androguard import util
 from androguard.core.apk import get_apkid
 import os
@@ -42,14 +43,17 @@ def load_files_progress(folder_path, progress_bar):
     total_files = len(package_dict)
     progress_bar.setMaximum(total_files)
     progress_bar.setValue(0)
-    
+
+    count_label.setText(f"APK's Found: 0")  # Reset count label
+
     item = tree.invisibleRootItem()
     for index, (filepath, packagename) in enumerate(package_dict.items(), 1):
         filename = os.path.basename(filepath)
         child_item = QTreeWidgetItem([filename, packagename, filepath])
         item.addChild(child_item)
-        
+
         progress_bar.setValue(index)
+        count_label.setText(f"APK's Found: {index}")  # Update count label
         QApplication.processEvents()
 
     progress_bar.setValue(total_files)
@@ -181,6 +185,8 @@ def open_file(item):
 # Connect the custom context menu function to the customContextMenu signal
 tree.customContextMenuRequested.connect(show_context_menu)
 
+
+
 search_layout = QHBoxLayout()
 search_label = QLabel("Search:")
 search_layout.addWidget(search_label)
@@ -247,6 +253,11 @@ progress_bar = QProgressBar()
 progress_bar.setAlignment(Qt.AlignCenter)
 layout.addWidget(progress_bar)
 window.show()
+
+count_label = QLabel("APK's Found: 0")
+font = QFont()
+font.setBold(True)
+layout.addWidget(count_label)
 
 tree.itemDoubleClicked.connect(on_item_double_click)
 
